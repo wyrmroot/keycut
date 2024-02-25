@@ -1,21 +1,18 @@
 # keycut
-Columnar file slicing using pattern matching
+Columnar slicing of large files using pattern matching
 
-`keycut` is inspired by `cut` but with a focus on working with tabular files by header names (keys).
+# About
+`keycut` is inspired by `cut` but focuses on working with tabular files by header names (keys).
+It is intended to reduce calls to heavier scripting languages for the sole purpose of file splitting and fit into the coreutils ecosystem of bash pipeline functions.
+
 Like `cut`, it prints columns according to the fields selected and aims to be performant including working with larger-than-memory files.
 
-`keycut` selects fields in two ways:
+`keycut` introduces two new ways of selecting columns:
 - By key name using `-k`
 - By regular expressions using `-e`
 
-Most options from `cut` are available, including delimiter specification and complement printing.
+All other options from `cut` are reproduced by `keycut`.
+The implementation of `-e`should be familiar to users of `grep`.
 
-# TODO
-- [ ] field selection by key
-- [ ] field selection by regex
-- [ ] ranges
-- [ ] case insensitivity
-- [x] complement
-- [ ] Test with "bad" files (mismatched col numbers / missing delimiters)
-- [ ] Test with larger-than-memory files
-- [x] Wrap mustcompile w/ stderr
+# License
+`keycut` is distributed under the MIT license and depends only the standard Go library.

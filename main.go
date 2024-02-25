@@ -14,43 +14,52 @@ import (
 var line_delim = byte('\n')
 
 func main() {
-	var doComplement bool
-	var ifs_raw string
-	var ofs_raw string
-	var fieldBlurb string
-	var regexBlurb string
-	var z_delim bool
-	var s_only_delim bool
-
+	var flag_complement bool
+	var flag_d_input_delim string
+	var flag_output_delim string
+	var flag_k_key_list string
+	var flag_e_regex_list string
+	var flag_z_delim bool
+	var flag_h_help bool
+	var flag_s_only_delim bool
+	
 	// Args common to cut
-	flag.StringVar(&ifs_raw, "d", "\t", "Field delimiter (default TAB)")
-	flag.BoolVar(&doComplement, "complement", false, "Print only fields which were not selected")
-	flag.StringVar(&ofs_raw, "output-delimiter", "", "Output field separator (default to input delimiter)")
-	flag.BoolVar(&z_delim, "z", false, "Use the null byte as the line delimiter")
-	flag.BoolVar(&s_only_delim, "s", false, "Do not print lines that do not contain the field delimiter")
+	flag.StringVar(&flag_d_input_delim, "d", "\t", "Field delimiter")
+	flag.BoolVar(&flag_complement, "complement", false, "Print only fields which were not selected")
+	flag.StringVar(&flag_output_delim, "output-delimiter", "", "Output field separator (default to input delimiter)")
+	flag.BoolVar(&flag_z_delim, "z", false, "Use the null byte as the line delimiter")
+	flag.BoolVar(&flag_s_only_delim, "s", false, "Do not print lines that do not contain the field delimiter")
 
 	// New args
-	flag.StringVar(&regexBlurb, "e", "", "Regular expression(s) to select column names. Separate with newline.")
-	flag.StringVar(&fieldBlurb, "k", "", "Key names to select, in order of desired output. Separate with ','")
+	flag.StringVar(&flag_e_regex_list, "e", "", "Regular expression(s) to select column names. Separate with newline.")
+	flag.StringVar(&flag_k_key_list, "k", "", "Key names to select, in order of desired output. Separate with ','")
+	flag.BoolVar(&flag_h_help, "help", false, "Display help information")
 
 	// Parse args
 	flag.Parse()
-	if fieldBlurb != "" && regexBlurb != "" {
-		abort(errors.New("may use only one of -f or -e"))
-	} else if fieldBlurb == "" && regexBlurb == "" {
-		flag.PrintDefaults()
-		abort(errors.New("must specify -f or -e"))
+
+	if flag_h_help {
+		fmt.Fprintf(os.Stderr, "keycut - key based selection of  \n")
+		fmt.Fprintf(os.Stderr, "Print sections from each line of each FILE to standard output.\n")
+		fmt.Fprintf(os.Stderr, "Select columns by key using -k for string matches or -e for regular expressions.\n")
+		flag.Usage()
 	}
-	if z_delim {
+
+	if flag_k_key_list != "" && flag_e_regex_list != "" {
+		abort(errors.New("may use only one of -k or -e\n try 'keycut --help' for more information"))
+	} else if flag_k_key_list == "" && flag_e_regex_list == "" {
+		abort(errors.New("must select fields with -k or -e\n try 'keycut --help' for more information"))
+	}
+	if flag_z_delim {
 		line_delim = byte(0)
 	}
 	// Unescape separator characters
-	ifs := unescapeString(ifs_raw)
+	ifs := unescapeString(flag_d_input_delim)
 	var ofs string
-	if ofs_raw == "" {
+	if flag_output_delim == "" {
 		ofs = ifs
 	} else {
-		ofs = unescapeString(ofs_raw)
+		ofs = unescapeString(flag_output_delim)
 	}
 
 	// Locate stream source
@@ -78,15 +87,14 @@ func main() {
 	var checker Checker
 	var keyIndices []int
 	switch {
-	case regexBlurb != "":
-		checker = MakeRegexChecker(regexBlurb)
+	case flag_e_regex_list != "":
+		checker = MakeRegexChecker(flag_e_regex_list)
 		keyIndices = findKeysWithChecker(ifs, ofs, scanner, writer, checker)
-	case fieldBlurb != "":
+	case flag_k_key_list != "":
 		// checker = MakeMembershipChecker(fieldBlurb)
-		fields := strings.Split(fieldBlurb, ",")
-		keyIndices = findKeysSimple(fields, ifs, ofs, doComplement, scanner, writer)
+		fields := strings.Split(flag_k_key_list, ",")
+		keyIndices = findKeysSimple(fields, ifs, ofs, flag_complement, scanner, writer)
 	}
-	fmt.Printf("got keys %v\n", keyIndices)
 
 	// Process all remaining lines
 	processLines(keyIndices, []byte(ifs), []byte(ofs), scanner, writer)
