@@ -14,5 +14,7 @@ Like `cut`, it prints columns according to the fields selected and aims to be pe
 All other options from `cut` are reproduced by `keycut`.
 The implementation of `-e`should be familiar to users of `grep`.
 
+Like `cut`, slicing on delimiters is done naively (and quickly) without regard for the context of potentially escaped delimiters (such as quoted commas in a CSV). For those cases, we recommend using a proper CSV parser.
+
 # License
 `keycut` is distributed under the MIT license and depends only the standard Go library.

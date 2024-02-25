@@ -22,26 +22,28 @@ func main() {
 	var flag_z_delim bool
 	var flag_h_help bool
 	var flag_s_only_delim bool
-	
+
 	// Args common to cut
 	flag.StringVar(&flag_d_input_delim, "d", "\t", "Field delimiter")
 	flag.BoolVar(&flag_complement, "complement", false, "Print only fields which were not selected")
 	flag.StringVar(&flag_output_delim, "output-delimiter", "", "Output field separator (default to input delimiter)")
-	flag.BoolVar(&flag_z_delim, "z", false, "Use the null byte as the line delimiter")
+	flag.BoolVar(&flag_z_delim, "z", false, "Use the null byte as the output line delimiter")
 	flag.BoolVar(&flag_s_only_delim, "s", false, "Do not print lines that do not contain the field delimiter")
 
 	// New args
-	flag.StringVar(&flag_e_regex_list, "e", "", "Regular expression(s) to select column names. Separate with newline.")
-	flag.StringVar(&flag_k_key_list, "k", "", "Key names to select, in order of desired output. Separate with ','")
+	flag.StringVar(&flag_e_regex_list, "e", "", "Regular expression(s) to select column names. Separate with \\n")
+	flag.StringVar(&flag_k_key_list, "k", "", "Key names to select in order of desired output. Separate with ,")
 	flag.BoolVar(&flag_h_help, "help", false, "Display help information")
 
 	// Parse args
 	flag.Parse()
 
 	if flag_h_help {
-		fmt.Fprintf(os.Stderr, "keycut - key based selection of  \n")
+		fmt.Fprintf(os.Stderr, "keycut - key based selection of file columns\n\n")
+		fmt.Fprintf(os.Stderr, "keycut OPTION... [FILE]...\n\n")
 		fmt.Fprintf(os.Stderr, "Print sections from each line of each FILE to standard output.\n")
-		fmt.Fprintf(os.Stderr, "Select columns by key using -k for string matches or -e for regular expressions.\n")
+		fmt.Fprintf(os.Stderr, "If FILE is empty or -, reads from standard input.\n")
+		fmt.Fprintf(os.Stderr, "Select using key name with -k or using regular expressions with -e.\n\n")
 		flag.Usage()
 	}
 
