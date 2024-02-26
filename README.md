@@ -1,7 +1,7 @@
 # keycut
 Columnar slicing of large files using pattern matching
 
-# About
+## About
 `keycut` is inspired by `cut` but focuses on working with tabular files by header names (keys).
 It is intended to fit into the coreutils ecosystem of bash pipeline functions and reduce calls to heavier scripting languages for file splitting.
 
@@ -16,7 +16,7 @@ The implementation of `-e`should be familiar to users of `grep`.
 
 Like `cut`, slicing on delimiters is done naively (and quickly) without regard for the context of potentially escaped delimiters (such as quoted commas in a CSV). For those cases, we recommend using a more comprehensive CSV parser.
 
-# Usage
+## Usage
 `-k <key-names>`
 
 Selects columns by exact key, where key-names is a comma separated list of strings.
@@ -55,5 +55,5 @@ The default behavior (preserved from `cut`) is to print the entirety of lines wh
 Use a zero byte as the output line delimiter (instead of `\n`).
 Used mainly alongside other commands which may do the same to enforce filename compatibility.
 
-# License
+## License
 `keycut` is distributed under the MIT license and depends only on the standard Go library.
