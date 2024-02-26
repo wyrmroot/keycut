@@ -99,7 +99,13 @@ func main() {
 	}
 
 	// Process all remaining lines
-	processLines(keyIndices, []byte(ifs), []byte(ofs), scanner, writer)
+	processLines(
+		keyIndices, 
+		[]byte(ifs), 
+		[]byte(ofs), 
+		flag_s_only_delim,
+		scanner, 
+		writer)
 	writer.Flush()
 }
 
@@ -283,12 +289,16 @@ func findKeysSimple(
 func processLines(
 	cols []int,
 	ifs, ofs []byte,
+	only_delimited bool,
 	scanner *bufio.Scanner,
 	writer *bufio.Writer,
 ) {
 	var buffer bytes.Buffer
 	for scanner.Scan() {
 		fields := bytes.Split(scanner.Bytes(), ifs)
+		if len(fields) == 1 && only_delimited {
+			continue
+		}
 		for i, pos := range cols {
 			if pos < len(fields) {
 				buffer.Write(fields[pos])
