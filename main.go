@@ -21,6 +21,7 @@ func main() {
 	var flag_e_regex_list string
 	var flag_z_delim bool
 	var flag_h_help bool
+	var flag_psrv_order bool
 	var flag_s_only_delim bool
 
 	// Args common to cut
@@ -34,6 +35,7 @@ func main() {
 	flag.StringVar(&flag_e_regex_list, "e", "", "Regular expression(s) to select column names. Separate with \\n")
 	flag.StringVar(&flag_k_key_list, "k", "", "Key names to select in order of desired output. Separate with ,")
 	flag.BoolVar(&flag_h_help, "help", false, "Display help information")
+	flag.BoolVar(&flag_psrv_order, "preserve-order", false, "Do not reorder or duplicate columns as listed with -k")
 
 	// Parse args
 	flag.Parse()
@@ -55,6 +57,7 @@ func main() {
 	if flag_z_delim {
 		line_delim = byte(0)
 	}
+
 	// Unescape separator characters
 	ifs := unescapeString(flag_d_input_delim)
 	var ofs string
@@ -95,7 +98,7 @@ func main() {
 	case flag_k_key_list != "":
 		// checker = MakeMembershipChecker(fieldBlurb)
 		fields := strings.Split(flag_k_key_list, ",")
-		keyIndices = findKeysSimple(fields, ifs, ofs, flag_complement, scanner, writer)
+		keyIndices = findKeysSimple(fields, ifs, ofs, flag_complement, flag_psrv_order, scanner, writer)
 	}
 
 	// Process all remaining lines
@@ -234,6 +237,7 @@ func findKeysSimple(
 	keyNames []string,
 	ifs, ofs string,
 	invert bool,
+	save_order bool,
 	scanner *bufio.Scanner,
 	writer *bufio.Writer,
 ) []int {
@@ -256,6 +260,20 @@ func findKeysSimple(
 		for i, f := range fields {
 			_, ok := positions[f]
 			if !ok {
+				results = append(results, i)
+				buffer.WriteString(f)
+				if i < len(fields)-1 {
+					buffer.WriteString(ofs)
+				}
+			}
+		}
+	} else if save_order {
+		for i, k := range keyNames {
+			positions[k] = i
+		}
+		for i, f := range fields {
+			_, ok := positions[f]
+			if ok {
 				results = append(results, i)
 				buffer.WriteString(f)
 				if i < len(fields)-1 {
