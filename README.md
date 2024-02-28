@@ -45,7 +45,7 @@ Displays help information.
 
 Output field delimiter, the character or string which will be used to separate columns as they are printed. Defaults to match the input delimiter.
 
-`preserve-order`
+`--preserve-order`
 
 Ensures that columns are printed in the order they appeared in the original file. Otherwise, they are printed according to the order they were requested with `-k` (including duplication). Has no effect on unordered selection methods such as `-e`.
 
