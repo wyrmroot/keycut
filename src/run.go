@@ -87,9 +87,16 @@ func processLines(
 	var buffer bytes.Buffer
 	for scanner.Scan() {
 		fields := bytes.Split(scanner.Bytes(), ifs)
-		if len(fields) == 1 && only_delimited {
+		// Handle unsplittable lines
+		// (print all or print none based on -s)
+		if len(fields) == 1 {
+			if !only_delimited {
+				buffer.Write(fields[0])
+				buffer.WriteByte(line_delim)
+				buffer.WriteTo(writer)
+			}
 			continue
-		}
+	}
 		for i, pos := range cols {
 			if pos < len(fields) {
 				buffer.Write(fields[pos])
