@@ -6,6 +6,7 @@ Columnar slicing of large files using pattern matching
 It is intended to fit into the coreutils ecosystem of bash pipeline functions and reduce calls to heavier scripting languages for file splitting.
 
 Like `cut`, it prints columns according to the fields selected and aims to be performant including working with larger-than-memory files.
+Slicing on delimiters is done naively (and quickly) without regard for the context of potentially escaped delimiters (such as quoted commas in a CSV). For those cases, we recommend using a more comprehensive CSV parser.
 
 `keycut` introduces two new ways of selecting columns:
 - By key name using `-k`
@@ -13,8 +14,6 @@ Like `cut`, it prints columns according to the fields selected and aims to be pe
 
 All other options from `cut` are reproduced by `keycut`.
 The implementation of `-e`should be familiar to users of `grep`.
-
-Like `cut`, slicing on delimiters is done naively (and quickly) without regard for the context of potentially escaped delimiters (such as quoted commas in a CSV). For those cases, we recommend using a more comprehensive CSV parser.
 
 ## Usage
 `-k <key-names>`
@@ -61,7 +60,3 @@ Used mainly alongside other commands which may do the same to enforce filename c
 
 ## License
 `keycut` is distributed under the MIT license and depends only on the standard Go library.
-
-## Performance ideas
-- producer/consumer goroutines for read/write
-- Manual GC
